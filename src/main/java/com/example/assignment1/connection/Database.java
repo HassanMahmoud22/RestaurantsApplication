@@ -1,23 +1,20 @@
 package com.example.assignment1.connection;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.http.ResponseEntity;
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Map;
 
 public interface Database {
-    default Connection establish_connection() throws SQLException, ClassNotFoundException {
+    default Connection establishConnection() throws SQLException {
         String url = "jdbc:mysql://localhost:3306/mobileDatabase";
-        Class.forName("com.mysql.jdbc.Driver");
         return DriverManager.getConnection(url,"root","root");
     }
-    ResponseEntity<Map> create(JSONObject jsonObject) throws JSONException, SQLException, ClassNotFoundException;
-    ResponseEntity<Map> update(JSONObject jsonObject) throws JSONException, SQLException, ClassNotFoundException;
-    ResponseEntity<Map> getUser(JSONObject credentials) throws SQLException, ClassNotFoundException, JSONException;
-    ResponseEntity<Map> isUserExist(JSONObject user) throws SQLException, ClassNotFoundException, JSONException;
+    ResponseEntity<Map<String, String>> create(JSONObject jsonObject) throws JSONException, SQLException, ClassNotFoundException;
+    ResponseEntity<Map<String, String>> update(JSONObject jsonObject) throws JSONException, SQLException, ClassNotFoundException;
+    ResponseEntity<Map<String, String>> getUser(JSONObject credentials) throws SQLException, ClassNotFoundException, JSONException;
+    ResponseEntity<Map<String, String>> isUserExist(JSONObject user) throws SQLException, ClassNotFoundException, JSONException;
 }

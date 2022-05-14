@@ -1,6 +1,5 @@
 package com.example.assignment1.security;
 
-import com.example.assignment1.enums.Gender;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
@@ -38,7 +37,7 @@ public class Security {
         return true;
     }
 
-    public ResponseEntity<Map> isValidUser(JSONObject user) {
+    public ResponseEntity<Map<String, String>> isValidUser(JSONObject user) {
         Map<String, String> message = new HashMap<>();
         try{
             if(!isValidName(user.getString(NAME))){
