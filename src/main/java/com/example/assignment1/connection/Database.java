@@ -10,8 +10,9 @@ import java.util.Map;
 
 public interface Database {
     default Connection establishConnection() throws SQLException {
-        String url = "jdbc:mysql://localhost:3306/mobileDatabase";
-        return DriverManager.getConnection(url,"root","root");
+        String url = "jdbc:mysql://bdc51d26dcc0d2:c7c63d4f@us-cdbr-east-05.cleardb.net/heroku_9f02f37849b58f3?reconnect=true";
+        Connection connection= DriverManager.getConnection(url,"bdc51d26dcc0d2","c7c63d4f");
+        return connection;
     }
     ResponseEntity<Map<String, String>> create(JSONObject jsonObject) throws JSONException, SQLException, ClassNotFoundException;
     ResponseEntity<Map<String, String>> update(JSONObject jsonObject) throws JSONException, SQLException, ClassNotFoundException;
