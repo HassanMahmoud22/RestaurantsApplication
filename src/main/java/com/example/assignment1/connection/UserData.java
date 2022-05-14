@@ -39,7 +39,7 @@ public class UserData implements Database{
             message.put(MESSAGE, EMAILCONNECTED);
             return new ResponseEntity<>(message, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-            message.put(MESSAGE,"The profile is updated Successfully");
+            message.put(MESSAGE,"The account is created successfully");
             return new ResponseEntity<>(message, HttpStatus.OK);
     }
 
