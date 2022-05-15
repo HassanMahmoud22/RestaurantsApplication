@@ -23,7 +23,7 @@ public class UserData implements Database{
     private static final String JSONKEYSNOTVALID = "Json keys aren't correct";
 
     @Override
-    public ResponseEntity<Map<String, String>> create(JSONObject user) throws JSONException, ClassNotFoundException {
+    public ResponseEntity<Map<String, String>> create(JSONObject user) throws JSONException, ClassNotFoundException, SQLException {
         Map<String, String> message = new HashMap<>();
         try{
             String query = "INSERT INTO users(Name, Gender, Email, level, password) VALUES(?,?,?,?,?) ";
@@ -39,8 +39,9 @@ public class UserData implements Database{
             message.put(MESSAGE, EMAILCONNECTED);
             return new ResponseEntity<>(message, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-            message.put(MESSAGE,"The account is created successfully");
-            return new ResponseEntity<>(message, HttpStatus.OK);
+        message = getUser(user).getBody();
+        message.put(MESSAGE,"The account is created successfully");
+        return new ResponseEntity<>(message, HttpStatus.OK);
     }
 
     @Override
@@ -95,6 +96,14 @@ public class UserData implements Database{
             data.put(MESSAGE, JSONKEYSNOTVALID);
             return new ResponseEntity<>(data, HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+
+    public  String getUserId(String email) throws SQLException{
+        Map<String,String> data = new HashMap<>();
+        Statement statement = establishConnection().createStatement();
+        ResultSet rs = statement.executeQuery("select * from users where email ='"+email+"'");
+        return rs.getString(ID);
     }
 
     @Override

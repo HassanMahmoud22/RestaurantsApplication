@@ -9,13 +9,14 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class Security {
+public class Validation {
     private static final String NAME = "name";
     private static final String GENDER = "gender";
     private static final String EMAIL = "email";
     private static final String LEVEL = "level";
     private static final String PASSWORD = "password";
     private static final String MESSAGE = "message";
+    private static final String TOKEN = "token";
 
     private boolean isValidEmail(String email){
         if(email.length() == 0)
