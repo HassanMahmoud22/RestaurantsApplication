@@ -53,9 +53,11 @@ public class Validation {
                 message.put(MESSAGE, "The email isn't valid");
                 return new ResponseEntity<>(message, HttpStatus.INTERNAL_SERVER_ERROR);
             }
-            if(user.getInt(LEVEL) > 4 || user.getInt(LEVEL) < 1){
-                message.put(MESSAGE, "The Level isn't valid");
-                return new ResponseEntity<>(message, HttpStatus.INTERNAL_SERVER_ERROR);
+            if(user.getString(LEVEL).length() > 0){
+                if(user.getInt(LEVEL) < 1 || user.getInt(LEVEL) > 4){
+                    message.put(MESSAGE, "The Level isn't valid");
+                    return new ResponseEntity<>(message, HttpStatus.INTERNAL_SERVER_ERROR);
+                }
             }
             if(user.getString(PASSWORD).length() < 8) {
                 message.put(MESSAGE, "The Password isn't valid");

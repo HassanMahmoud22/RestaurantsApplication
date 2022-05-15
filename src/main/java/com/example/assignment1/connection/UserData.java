@@ -26,13 +26,25 @@ public class UserData implements Database{
     public ResponseEntity<Map<String, String>> create(JSONObject user) throws JSONException, ClassNotFoundException, SQLException {
         Map<String, String> message = new HashMap<>();
         try{
-            String query = "INSERT INTO users(Name, Gender, Email, level, password) VALUES(?,?,?,?,?) ";
-            PreparedStatement preparedStmt = establishConnection().prepareStatement(query);
-            preparedStmt.setString (1, user.getString(NAME));
-            preparedStmt.setString (2, user.getString(GENDER));
-            preparedStmt.setString (3, user.getString(EMAIL));
-            preparedStmt.setInt (4, user.getInt(LEVEL));
-            preparedStmt.setString (5, user.getString(PASSWORD));
+            String query;
+            PreparedStatement preparedStmt;
+            if(user.getString(LEVEL).length() > 0){
+                query = "INSERT INTO users(Name, Gender, Email, level, password) VALUES(?,?,?,?,?) ";
+                preparedStmt = establishConnection().prepareStatement(query);
+                preparedStmt.setString (1, user.getString(NAME));
+                preparedStmt.setString (2, user.getString(GENDER));
+                preparedStmt.setString (3, user.getString(EMAIL));
+                preparedStmt.setInt (4, user.getInt(LEVEL));
+                preparedStmt.setString (5, user.getString(PASSWORD));
+            }
+            else{
+                query = "INSERT INTO users(Name, Gender, Email, password) VALUES(?,?,?,?) ";
+                preparedStmt = establishConnection().prepareStatement(query);
+                preparedStmt.setString (1, user.getString(NAME));
+                preparedStmt.setString (2, user.getString(GENDER));
+                preparedStmt.setString (3, user.getString(EMAIL));
+                preparedStmt.setString (4, user.getString(PASSWORD));
+            }
             preparedStmt.executeUpdate();
             establishConnection().close();
         }catch (SQLException e){
@@ -82,7 +94,10 @@ public class UserData implements Database{
                 data.put(NAME, rs.getString(NAME));
                 data.put(PASSWORD, rs.getString(PASSWORD));
                 data.put(GENDER, rs.getString(GENDER));
-                data.put(LEVEL, rs.getString(LEVEL));
+                if(rs.getString(LEVEL) != null)
+                    data.put(LEVEL, rs.getString(LEVEL));
+                else
+                    data.put(LEVEL, "");
                 data.put(EMAIL, rs.getString(EMAIL));
                 data.put(MESSAGE, "logged in successfully");
                 return new ResponseEntity<>(data, HttpStatus.OK);

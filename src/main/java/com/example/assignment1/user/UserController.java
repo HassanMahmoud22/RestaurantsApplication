@@ -43,7 +43,6 @@ public class UserController implements IUser {
         ResponseEntity<Map<String, String>> loginResponse = database.getUser(credentialsJson);
         if(loginResponse.getStatusCode() == HttpStatus.OK){
             loginResponse.getBody().put("token", jwtTokenUtil.generateToken(loginResponse.getBody()));
-            System.out.println("token " +  jwtTokenUtil.getAllClaimsFromToken(loginResponse.getBody().get("token")));
         }
         return loginResponse;
     }
