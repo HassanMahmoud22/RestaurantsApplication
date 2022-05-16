@@ -1,5 +1,7 @@
 package com.example.assignment1.security;
 
+import com.example.assignment1.constants.Keys;
+import com.example.assignment1.constants.Messages;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
@@ -10,13 +12,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Validation {
-    private static final String NAME = "name";
-    private static final String GENDER = "gender";
-    private static final String EMAIL = "email";
-    private static final String LEVEL = "level";
-    private static final String PASSWORD = "password";
-    private static final String MESSAGE = "message";
-    private static final String TOKEN = "token";
 
     private boolean isValidEmail(String email){
         if(email.length() == 0)
@@ -41,28 +36,26 @@ public class Validation {
     public ResponseEntity<Map<String, String>> isValidUser(JSONObject user) {
         Map<String, String> message = new HashMap<>();
         try{
-            if(!isValidName(user.getString(NAME))){
-                message.put(MESSAGE, "The name isn't valid");
+            if(!isValidName(user.getString(Keys.NAME))){
+                message.put(Keys.MESSAGE, Messages.NAMENOTVALID);
                 return new ResponseEntity<>(message, HttpStatus.INTERNAL_SERVER_ERROR);
             }
-            if(!isValidEmail(user.getString(EMAIL))){
-                message.put(MESSAGE, "The email isn't valid");
+            if(!isValidEmail(user.getString(Keys.EMAIL))){
+                message.put(Keys.MESSAGE, Messages.EMAILNOTVALID);
                 return new ResponseEntity<>(message, HttpStatus.INTERNAL_SERVER_ERROR);
             }
-            if(user.getString(LEVEL).length() > 0){
-                if(user.getInt(LEVEL) < 1 || user.getInt(LEVEL) > 4){
-                    message.put(MESSAGE, "The Level isn't valid");
-                    return new ResponseEntity<>(message, HttpStatus.INTERNAL_SERVER_ERROR);
-                }
-            }
-            if(user.getString(PASSWORD).length() < 8) {
-                message.put(MESSAGE, "The Password isn't valid");
+            if((user.getString(Keys.LEVEL).length() > 0) && (user.getInt(Keys.LEVEL) < 1 || user.getInt(Keys.LEVEL) > 4)){
+                message.put(Keys.MESSAGE, Messages.LEVELNOTVALID);
                 return new ResponseEntity<>(message, HttpStatus.INTERNAL_SERVER_ERROR);
             }
-            message.put(MESSAGE, "valid user");
+            if(user.getString(Keys.PASSWORD).length() < 8) {
+                message.put(Keys.MESSAGE, Messages.PASSWORDNOTVALID);
+                return new ResponseEntity<>(message, HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+            message.put(Keys.MESSAGE, Messages.VALIDUSER);
             return new ResponseEntity<>(message, HttpStatus.OK);
         }catch (JSONException e){
-            message.put(MESSAGE, "Json keys are not correct");
+            message.put(Keys.MESSAGE, Messages.JSONKEYSNOTVALID);
             return new ResponseEntity<>(message, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

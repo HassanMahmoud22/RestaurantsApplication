@@ -1,14 +1,12 @@
 package com.example.assignment1.security;
 
 import java.io.Serializable;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
-
-import com.example.assignment1.connection.Database;
-import com.example.assignment1.connection.UserData;
+import com.example.assignment1.constants.Keys;
+import com.example.assignment1.constants.Messages;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -22,14 +20,7 @@ public class JwtTokenUtil implements Serializable {
 
     private static final long serialVersionUID = -2550185165626007488L;
     public static final long JWT_TOKEN_VALIDITY = 5 * 60 * 60;
-    Database database = new UserData();
-    UserData userData = new UserData();
     private static final String SECRET = "MTIzNDU2Nzg=";
-    private static final String MESSAGE = "message";
-    private static final String ID = "id";
-    private static final String TOKEN = "token";
-    private static final String AUTHORIZED = "Authorized User";
-    private static final String UNAUTHORIZED = "unauthorized User";
 
     //retrieve username from jwt token
     public String getUserFromToken(String token) {
@@ -58,16 +49,15 @@ public class JwtTokenUtil implements Serializable {
 
     private String getUserData(JSONObject user){
         JSONObject result = new JSONObject();
-        result.put(ID, user.getString(ID));
-        user.remove(ID);
+        result.put(Keys.ID, user.getString(Keys.ID));
+        user.remove(Keys.ID);
         return result.toString();
     }
 
     public JSONObject getIdFromToken(JSONObject tokenJson){
-        String token = tokenJson.getString(TOKEN);
+        String token = tokenJson.getString(Keys.TOKEN);
         String id = getUserFromToken(token);
-        JSONObject idJson = new JSONObject(id);
-        return idJson;
+        return new JSONObject(id);
     }
     //generate token for user
     public String generateToken(Map<String, String> userDetails) {
@@ -86,8 +76,30 @@ public class JwtTokenUtil implements Serializable {
                 .signWith(SignatureAlgorithm.HS512, SECRET).compact();
     }
 
-    //validate token
-   /* public ResponseEntity<Map<String, String>> validateToken(JSONObject user) {
+    public ResponseEntity<Map<String, String>> validateToken(JSONObject user) {
+        Map<String, String> message = new HashMap<>();
+        try{
+            String token = user.getString(Keys.TOKEN);
+            if(!isTokenExpired(token)){
+                message.put(Keys.MESSAGE, Messages.AUTHORIZED);
+                return new ResponseEntity<>(message, HttpStatus.OK);
+            }
+            message.put(Keys.MESSAGE, Messages.UNAUTHORIZED);
+            return new ResponseEntity<>(message, HttpStatus.UNAUTHORIZED);
+        }
+        catch (SignatureException e){
+            message.put(Keys.MESSAGE, Messages.UNAUTHORIZED);
+            return new ResponseEntity<>(message, HttpStatus.UNAUTHORIZED);
+        }
+        catch (JSONException e){
+            message.put(Keys.MESSAGE, Messages.JSONKEYSNOTVALID);
+            return new ResponseEntity<>(message, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+}
+
+ /*//validate token
+     public ResponseEntity<Map<String, String>> validateToken(JSONObject user) {
         Map<String, String> message = new HashMap<>();
         try{
             String userFromToken = sortUserData(getUserFromToken(user.getString(TOKEN)));
@@ -108,25 +120,3 @@ public class JwtTokenUtil implements Serializable {
             return new ResponseEntity<>(message, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }*/
-    public ResponseEntity<Map<String, String>> validateToken(JSONObject user) {
-        Map<String, String> message = new HashMap<>();
-        try{
-            String token = user.getString(TOKEN);
-            if(!isTokenExpired(token)){
-                message.put(MESSAGE, AUTHORIZED);
-                return new ResponseEntity<>(message, HttpStatus.OK);
-            }
-            message.put(MESSAGE, UNAUTHORIZED);
-            return new ResponseEntity<>(message, HttpStatus.UNAUTHORIZED);
-        }
-        catch (SignatureException e){
-            message.put(MESSAGE, UNAUTHORIZED);
-            return new ResponseEntity<>(message, HttpStatus.UNAUTHORIZED);
-        }
-        catch (JSONException e){
-            message.put(MESSAGE, "Json keys are not correct");
-            return new ResponseEntity<>(message, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-}

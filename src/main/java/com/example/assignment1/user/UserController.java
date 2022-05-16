@@ -2,6 +2,8 @@ package com.example.assignment1.user;
 
 import com.example.assignment1.connection.Database;
 import com.example.assignment1.connection.UserData;
+import com.example.assignment1.constants.Keys;
+import com.example.assignment1.constants.Messages;
 import com.example.assignment1.security.JwtTokenUtil;
 import com.example.assignment1.security.Validation;
 import org.json.JSONException;
@@ -9,8 +11,6 @@ import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.yaml.snakeyaml.events.Event;
-
 import java.sql.SQLException;
 import java.util.Map;
 
@@ -30,7 +30,7 @@ public class UserController implements IUser {
         if(UserValidationResponse.getStatusCode() == HttpStatus.OK){
             ResponseEntity<Map<String, String>> signupResponse = database.create(userJson);
             if(signupResponse.getStatusCode() == HttpStatus.OK)
-                signupResponse.getBody().put("token", jwtTokenUtil.generateToken(database.getIdByCredentials(userJson).getBody()));
+                signupResponse.getBody().put(Keys.TOKEN, jwtTokenUtil.generateToken(database.getIdByCredentials(userJson).getBody()));
             return signupResponse;
         }
        else
@@ -44,11 +44,11 @@ public class UserController implements IUser {
         JSONObject credentialsJson = new JSONObject(credentials);
         ResponseEntity<Map<String, String>> loginResponse = database.isUserExist(credentialsJson);
         if(loginResponse.getStatusCode() == HttpStatus.OK){
-            loginResponse.getBody().put("message", "logged in successfully");
-            loginResponse.getBody().put("token", jwtTokenUtil.generateToken(database.getIdByCredentials(credentialsJson).getBody()));
+            loginResponse.getBody().put(Keys.MESSAGE, Messages.LOGINSUCCESS);
+            loginResponse.getBody().put(Keys.TOKEN, jwtTokenUtil.generateToken(database.getIdByCredentials(credentialsJson).getBody()));
             return loginResponse;
         }
-        loginResponse.getBody().put("message", "The Credentials are wrong");
+        loginResponse.getBody().put(Keys.MESSAGE, Messages.LOGINFAILED);
         return loginResponse;
     }
 
@@ -59,7 +59,7 @@ public class UserController implements IUser {
         JSONObject userJson = new JSONObject(user);
         if(validation.isValidUser(userJson).getStatusCode() == HttpStatus.OK){
             if(jwtTokenUtil.validateToken(userJson).getStatusCode() == HttpStatus.OK){
-                    userJson.put("id", jwtTokenUtil.getIdFromToken(userJson).getString("id"));
+                    userJson.put(Keys.ID, jwtTokenUtil.getIdFromToken(userJson).getString(Keys.ID));
                     return database.update(userJson);
             }
             return jwtTokenUtil.validateToken(userJson);
