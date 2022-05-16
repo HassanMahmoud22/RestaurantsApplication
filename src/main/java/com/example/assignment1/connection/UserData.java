@@ -51,13 +51,12 @@ public class UserData implements Database{
             message.put(MESSAGE, EMAILCONNECTED);
             return new ResponseEntity<>(message, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        message = getIdByCredentials(user).getBody();
         message.put(MESSAGE,"The account is created successfully");
         return new ResponseEntity<>(message, HttpStatus.OK);
     }
 
     @Override
-    public ResponseEntity<Map<String, String>> update(JSONObject user) throws ClassNotFoundException {
+    public ResponseEntity<Map<String, String>> update(JSONObject user) {
         Map<String, String> message = new HashMap<>();
         try{
             String query = "UPDATE users SET name = ?, email = ?, password = ?, gender = ?, level = ? WHERE id = ?";
@@ -103,6 +102,7 @@ public class UserData implements Database{
         }
     }
 
+
     @Override
     public  ResponseEntity<Map<String, String>> read(JSONObject id) throws SQLException{
         Map<String,String> data = new HashMap<>();
@@ -111,7 +111,6 @@ public class UserData implements Database{
             ResultSet rs = statement.executeQuery("select * from users where id ='"+id.getString(ID)+"'");
             if(rs.next())
             {
-                data.put(ID, rs.getString(ID));
                 data.put(NAME, rs.getString(NAME));
                 data.put(PASSWORD, rs.getString(PASSWORD));
                 data.put(GENDER, rs.getString(GENDER));
@@ -134,11 +133,11 @@ public class UserData implements Database{
     }
 
     @Override
-    public ResponseEntity<Map<String, String>> isUserExist(JSONObject user) throws SQLException, ClassNotFoundException {
+    public ResponseEntity<Map<String, String>> isUserExist(JSONObject credentials) throws SQLException {
         Map<String, String> message = new HashMap<>();
         try {
             Statement statement = establishConnection().createStatement();
-            ResultSet rs = statement.executeQuery("select * from users where id ='" + user.getString(ID) + "'");
+            ResultSet rs = statement.executeQuery("select * from users where email ='"+credentials.getString(EMAIL)+"' and password ='" + credentials.getString(PASSWORD) + "'");
             if (rs.next()) {
                 message.put(MESSAGE, "User Exists");
                 return new ResponseEntity<>(message, HttpStatus.OK);

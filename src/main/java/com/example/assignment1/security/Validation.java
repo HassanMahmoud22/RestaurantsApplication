@@ -45,10 +45,6 @@ public class Validation {
                 message.put(MESSAGE, "The name isn't valid");
                 return new ResponseEntity<>(message, HttpStatus.INTERNAL_SERVER_ERROR);
             }
-           /* if(user.getString(GENDER).length() == 0) {
-                message.put(MESSAGE, "The gender isn't valid");
-                return new ResponseEntity<>(message, HttpStatus.INTERNAL_SERVER_ERROR);
-            }*/
             if(!isValidEmail(user.getString(EMAIL))){
                 message.put(MESSAGE, "The email isn't valid");
                 return new ResponseEntity<>(message, HttpStatus.INTERNAL_SERVER_ERROR);

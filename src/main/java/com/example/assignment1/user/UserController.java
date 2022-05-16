@@ -9,6 +9,8 @@ import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.yaml.snakeyaml.events.Event;
+
 import java.sql.SQLException;
 import java.util.Map;
 
@@ -24,15 +26,15 @@ public class UserController implements IUser {
     @Override
     public ResponseEntity<Map<String, String>> register(@RequestBody String user) throws JSONException, SQLException, ClassNotFoundException{
         JSONObject userJson = new JSONObject(user);
-        ResponseEntity<Map<String, String>> validationResponse = validation.isValidUser(userJson);
-        if(validationResponse.getStatusCode() == HttpStatus.OK){
+        ResponseEntity<Map<String, String>> UserValidationResponse = validation.isValidUser(userJson);
+        if(UserValidationResponse.getStatusCode() == HttpStatus.OK){
             ResponseEntity<Map<String, String>> signupResponse = database.create(userJson);
             if(signupResponse.getStatusCode() == HttpStatus.OK)
-                signupResponse.getBody().put("token", jwtTokenUtil.generateToken(signupResponse.getBody()));
+                signupResponse.getBody().put("token", jwtTokenUtil.generateToken(database.getIdByCredentials(userJson).getBody()));
             return signupResponse;
         }
        else
-           return validationResponse;
+           return UserValidationResponse;
     }
 
     @RequestMapping("login")
@@ -40,10 +42,11 @@ public class UserController implements IUser {
     @Override
     public ResponseEntity<Map<String, String>> login(@RequestBody String credentials) throws JSONException, SQLException, ClassNotFoundException {
         JSONObject credentialsJson = new JSONObject(credentials);
-        ResponseEntity<Map<String, String>> loginResponse = database.getIdByCredentials(credentialsJson);
+        ResponseEntity<Map<String, String>> loginResponse = database.isUserExist(credentialsJson);
         if(loginResponse.getStatusCode() == HttpStatus.OK){
             loginResponse.getBody().put("message", "logged in successfully");
-            loginResponse.getBody().put("token", jwtTokenUtil.generateToken(loginResponse.getBody()));
+            loginResponse.getBody().put("token", jwtTokenUtil.generateToken(database.getIdByCredentials(credentialsJson).getBody()));
+            return loginResponse;
         }
         loginResponse.getBody().put("message", "The Credentials are wrong");
         return loginResponse;
@@ -56,9 +59,8 @@ public class UserController implements IUser {
         JSONObject userJson = new JSONObject(user);
         if(validation.isValidUser(userJson).getStatusCode() == HttpStatus.OK){
             if(jwtTokenUtil.validateToken(userJson).getStatusCode() == HttpStatus.OK){
-                if(database.isUserExist(userJson).getStatusCode() == HttpStatus.OK)
+                    userJson.put("id", jwtTokenUtil.getIdFromToken(userJson).getString("id"));
                     return database.update(userJson);
-                return database.isUserExist(userJson);
             }
             return jwtTokenUtil.validateToken(userJson);
         }
@@ -68,11 +70,13 @@ public class UserController implements IUser {
     @RequestMapping("getUser")
     @PostMapping
     @Override
-    public ResponseEntity<Map<String, String>> getUser(@RequestBody String idAndToken) throws JSONException, SQLException, ClassNotFoundException {
-        JSONObject idAndTokenJson = new JSONObject(idAndToken);
-        if (jwtTokenUtil.validateToken(idAndTokenJson).getStatusCode() == HttpStatus.OK) {
-            return database.read(idAndTokenJson);
+    public ResponseEntity<Map<String, String>> getUser(@RequestBody String token) throws JSONException, SQLException, ClassNotFoundException {
+        JSONObject tokenJson = new JSONObject(token);
+        ResponseEntity validationResponse = jwtTokenUtil.validateToken(tokenJson);
+        if (validationResponse.getStatusCode() == HttpStatus.OK) {
+            JSONObject id = jwtTokenUtil.getIdFromToken(tokenJson);
+            return database.read(id);
         }
-        return jwtTokenUtil.validateToken(idAndTokenJson);
+        return validationResponse;
     }
 }
