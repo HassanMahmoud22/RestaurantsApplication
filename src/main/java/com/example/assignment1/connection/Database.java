@@ -16,6 +16,7 @@ public interface Database {
     }
     ResponseEntity<Map<String, String>> create(JSONObject jsonObject) throws JSONException, SQLException, ClassNotFoundException;
     ResponseEntity<Map<String, String>> update(JSONObject jsonObject) throws JSONException, SQLException, ClassNotFoundException;
-    ResponseEntity<Map<String, String>> getUser(JSONObject credentials) throws SQLException, ClassNotFoundException, JSONException;
+    ResponseEntity<Map<String, String>> read(JSONObject jsonObject) throws JSONException, SQLException, ClassNotFoundException;
+    ResponseEntity<Map<String, String>> getIdByCredentials(JSONObject credentials) throws SQLException, ClassNotFoundException, JSONException;
     ResponseEntity<Map<String, String>> isUserExist(JSONObject user) throws SQLException, ClassNotFoundException, JSONException;
 }

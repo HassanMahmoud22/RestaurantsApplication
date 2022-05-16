@@ -40,10 +40,12 @@ public class UserController implements IUser {
     @Override
     public ResponseEntity<Map<String, String>> login(@RequestBody String credentials) throws JSONException, SQLException, ClassNotFoundException {
         JSONObject credentialsJson = new JSONObject(credentials);
-        ResponseEntity<Map<String, String>> loginResponse = database.getUser(credentialsJson);
+        ResponseEntity<Map<String, String>> loginResponse = database.getIdByCredentials(credentialsJson);
         if(loginResponse.getStatusCode() == HttpStatus.OK){
+            loginResponse.getBody().put("message", "logged in successfully");
             loginResponse.getBody().put("token", jwtTokenUtil.generateToken(loginResponse.getBody()));
         }
+        loginResponse.getBody().put("message", "The Credentials are wrong");
         return loginResponse;
     }
 
@@ -61,5 +63,16 @@ public class UserController implements IUser {
             return jwtTokenUtil.validateToken(userJson);
         }
         return validation.isValidUser(userJson);
+    }
+
+    @RequestMapping("getUser")
+    @PostMapping
+    @Override
+    public ResponseEntity<Map<String, String>> getUser(@RequestBody String idAndToken) throws JSONException, SQLException, ClassNotFoundException {
+        JSONObject idAndTokenJson = new JSONObject(idAndToken);
+        if (jwtTokenUtil.validateToken(idAndTokenJson).getStatusCode() == HttpStatus.OK) {
+            return database.read(idAndTokenJson);
+        }
+        return jwtTokenUtil.validateToken(idAndTokenJson);
     }
 }

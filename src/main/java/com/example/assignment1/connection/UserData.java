@@ -23,7 +23,7 @@ public class UserData implements Database{
     private static final String JSONKEYSNOTVALID = "Json keys aren't correct";
 
     @Override
-    public ResponseEntity<Map<String, String>> create(JSONObject user) throws JSONException, ClassNotFoundException, SQLException {
+    public ResponseEntity<Map<String, String>> create(JSONObject user) throws JSONException, SQLException {
         Map<String, String> message = new HashMap<>();
         try{
             String query;
@@ -51,7 +51,7 @@ public class UserData implements Database{
             message.put(MESSAGE, EMAILCONNECTED);
             return new ResponseEntity<>(message, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        message = getUser(user).getBody();
+        message = getIdByCredentials(user).getBody();
         message.put(MESSAGE,"The account is created successfully");
         return new ResponseEntity<>(message, HttpStatus.OK);
     }
@@ -83,11 +83,32 @@ public class UserData implements Database{
     }
 
     @Override
-    public  ResponseEntity<Map<String, String>> getUser(JSONObject credentials) throws SQLException, ClassNotFoundException{
+    public  ResponseEntity<Map<String, String>> getIdByCredentials(JSONObject credentials) throws SQLException{
         Map<String,String> data = new HashMap<>();
         try{
             Statement statement = establishConnection().createStatement();
             ResultSet rs = statement.executeQuery("select * from users where email ='"+credentials.getString(EMAIL)+"' and password ='" + credentials.getString(PASSWORD) + "'");
+            if(rs.next())
+            {
+                data.put(ID, rs.getString(ID));
+                return new ResponseEntity<>(data, HttpStatus.OK);
+            }
+            else{
+                return new ResponseEntity<>(data, HttpStatus.NOT_FOUND);
+            }
+        }
+        catch (JSONException e){
+            data.put(MESSAGE, JSONKEYSNOTVALID);
+            return new ResponseEntity<>(data, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @Override
+    public  ResponseEntity<Map<String, String>> read(JSONObject id) throws SQLException{
+        Map<String,String> data = new HashMap<>();
+        try{
+            Statement statement = establishConnection().createStatement();
+            ResultSet rs = statement.executeQuery("select * from users where id ='"+id.getString(ID)+"'");
             if(rs.next())
             {
                 data.put(ID, rs.getString(ID));
@@ -99,11 +120,10 @@ public class UserData implements Database{
                 else
                     data.put(LEVEL, "");
                 data.put(EMAIL, rs.getString(EMAIL));
-                data.put(MESSAGE, "logged in successfully");
                 return new ResponseEntity<>(data, HttpStatus.OK);
             }
             else{
-                data.put(MESSAGE, "The Credentials are wrong");
+                data.put(MESSAGE, "There's no user with this id");
                 return new ResponseEntity<>(data, HttpStatus.NOT_FOUND);
             }
         }
@@ -111,14 +131,6 @@ public class UserData implements Database{
             data.put(MESSAGE, JSONKEYSNOTVALID);
             return new ResponseEntity<>(data, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-    }
-
-
-    public  String getUserId(String email) throws SQLException{
-        Map<String,String> data = new HashMap<>();
-        Statement statement = establishConnection().createStatement();
-        ResultSet rs = statement.executeQuery("select * from users where email ='"+email+"'");
-        return rs.getString(ID);
     }
 
     @Override
