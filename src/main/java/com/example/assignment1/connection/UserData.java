@@ -52,19 +52,34 @@ public class UserData implements Database{
     public ResponseEntity<Map<String, String>> update(JSONObject user) {
         Map<String, String> message = new HashMap<>();
         try{
-            String query = "UPDATE users SET name = ?, email = ?, password = ?, gender = ?, level = ? WHERE id = ?";
-            PreparedStatement preparedStmt = establishConnection().prepareStatement(query);
-            preparedStmt.setString(1, user.getString(Keys.NAME));
-            preparedStmt.setString(2, user.getString(Keys.EMAIL));
-            preparedStmt.setString(3, user.getString(Keys.PASSWORD));
-            preparedStmt.setString(4, user.getString(Keys.GENDER));
-            preparedStmt.setString(5, user.getString(Keys.LEVEL));
-            preparedStmt.setString(6, user.getString(Keys.ID));
-            preparedStmt.executeUpdate();
-            establishConnection().close();
+            String query;
+            if(user.getString(Keys.LEVEL).length() > 0){
+                query = "UPDATE users SET name = ?, email = ?, password = ?, gender = ?, level = ? WHERE id = ?";
+                PreparedStatement preparedStmt = establishConnection().prepareStatement(query);
+                preparedStmt.setString(1, user.getString(Keys.NAME));
+                preparedStmt.setString(2, user.getString(Keys.EMAIL));
+                preparedStmt.setString(3, user.getString(Keys.PASSWORD));
+                preparedStmt.setString(4, user.getString(Keys.GENDER));
+                preparedStmt.setString(5, user.getString(Keys.LEVEL));
+                preparedStmt.setString(6, user.getString(Keys.ID));
+                preparedStmt.executeUpdate();
+                establishConnection().close();
+            }
+            else{
+                query = "UPDATE users SET name = ?, email = ?, password = ?, gender = ? WHERE id = ?";
+                PreparedStatement preparedStmt = establishConnection().prepareStatement(query);
+                preparedStmt.setString(1, user.getString(Keys.NAME));
+                preparedStmt.setString(2, user.getString(Keys.EMAIL));
+                preparedStmt.setString(3, user.getString(Keys.PASSWORD));
+                preparedStmt.setString(4, user.getString(Keys.GENDER));
+                preparedStmt.setString(5, user.getString(Keys.ID));
+                preparedStmt.executeUpdate();
+                establishConnection().close();
+            }
             message.put(Keys.MESSAGE, Messages.PROFILEUPDATED);
             return new ResponseEntity<>(message, HttpStatus.OK);
         }catch (SQLException e){
+            System.out.println(e);
             message.put(Keys.MESSAGE, Messages.EMAILCONNECTED);
             return new ResponseEntity<>(message, HttpStatus.INTERNAL_SERVER_ERROR);
         }
