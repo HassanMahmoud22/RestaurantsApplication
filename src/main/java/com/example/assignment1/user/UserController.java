@@ -1,6 +1,8 @@
 package com.example.assignment1.user;
 
 import com.example.assignment1.connection.Database;
+import com.example.assignment1.connection.StoresData;
+import com.example.assignment1.connection.StoresDatabase;
 import com.example.assignment1.connection.UserData;
 import com.example.assignment1.constants.Keys;
 import com.example.assignment1.constants.Messages;
@@ -12,6 +14,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 @CrossOrigin
@@ -72,10 +76,64 @@ public class UserController implements IUser {
     @Override
     public ResponseEntity<Map<String, String>> getUser(@RequestBody String token) throws JSONException, SQLException, ClassNotFoundException {
         JSONObject tokenJson = new JSONObject(token);
-        ResponseEntity validationResponse = jwtTokenUtil.validateToken(tokenJson);
+        ResponseEntity<Map<String, String>> validationResponse = jwtTokenUtil.validateToken(tokenJson);
         if (validationResponse.getStatusCode() == HttpStatus.OK) {
             JSONObject id = jwtTokenUtil.getIdFromToken(tokenJson);
             return database.read(id);
+        }
+        return validationResponse;
+    }
+
+    @RequestMapping("getStores")
+    @PostMapping
+    @Override
+    public ResponseEntity<List<Map<String,String>>> getStores(@RequestBody String user) throws JSONException, SQLException {
+        StoresDatabase storesDatabase = new StoresData();
+        List<Map<String, String>> dummy = new ArrayList<>();
+        JSONObject userJson = new JSONObject(user);
+        if(jwtTokenUtil.validateToken(userJson).getStatusCode() == HttpStatus.OK){
+            return storesDatabase.read();
+        }
+        return new ResponseEntity<>(dummy, jwtTokenUtil.validateToken(userJson).getStatusCode());
+    }
+
+    @RequestMapping("getStore")
+    @PostMapping
+    @Override
+    public ResponseEntity<Map<String,String>> getStore(@RequestBody String request) throws JSONException, SQLException {
+        StoresDatabase storesDatabase = new StoresData();
+        JSONObject requestJson = new JSONObject(request);
+        ResponseEntity<Map<String, String>> validationResponse = jwtTokenUtil.validateToken(requestJson);
+        if(validationResponse.getStatusCode() == HttpStatus.OK){
+            return storesDatabase.getStore(requestJson);
+        }
+        return validationResponse;
+    }
+
+    @RequestMapping("listAllFavorites")
+    @PostMapping
+    @Override
+    public ResponseEntity<List<Map<String, String>>> listAllFavorites(@RequestBody String user) throws JSONException, SQLException {
+        StoresDatabase storesDatabase = new StoresData();
+        JSONObject userJson = new JSONObject(user);
+        List<Map<String, String>> dummy = new ArrayList<>();
+        if(jwtTokenUtil.validateToken(userJson).getStatusCode() == HttpStatus.OK){
+            userJson.put(Keys.ID, jwtTokenUtil.getIdFromToken(userJson).getString(Keys.ID));
+            return storesDatabase.listAllFavorites(userJson);
+        }
+        return new ResponseEntity<>(dummy, jwtTokenUtil.validateToken(userJson).getStatusCode());
+    }
+
+    @RequestMapping("addToFavorite")
+    @PostMapping
+    @Override
+    public ResponseEntity<Map<String, String>> addToFavorite(@RequestBody String user) throws JSONException, SQLException {
+        StoresDatabase storesDatabase = new StoresData();
+        JSONObject userJson = new JSONObject(user);
+        ResponseEntity<Map<String, String>> validationResponse = jwtTokenUtil.validateToken(userJson);
+        if(validationResponse.getStatusCode() == HttpStatus.OK){
+            userJson.put(Keys.USERID, jwtTokenUtil.getIdFromToken(userJson).getString(Keys.ID));
+            return storesDatabase.addToFavorite(userJson);
         }
         return validationResponse;
     }

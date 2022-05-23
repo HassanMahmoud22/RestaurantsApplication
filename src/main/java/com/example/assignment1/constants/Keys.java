@@ -10,4 +10,11 @@ public class Keys {
     public static final String PASSWORD = "password";
     public static final String MESSAGE = "message";
     public static final String TOKEN = "token";
+    public static final String PHOTO = "photo";
+    public static final String LATITUDE = "latitude";
+    public static final String LONGITUDE = "longitude";
+    public static final String STORE = "storeName";
+    public static final String STOREID = "storeId";
+    public static final String USERID = "userId";
+    public static final String DESCRIPTION = "description";
 }
