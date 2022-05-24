@@ -65,27 +65,30 @@ public class StoresData implements StoresDatabase {
 
     @Override
     public ResponseEntity<Map<String, String>> addToFavorite(JSONObject user) throws SQLException {
-        Map<String, String> message = new HashMap<>();
-        try {
-            String query;
-            PreparedStatement preparedStmt;
-            query = "INSERT INTO favorites(userId, storeId) VALUES(?, ?) ";
-            preparedStmt = establishConnection().prepareStatement(query);
-            preparedStmt.setString(1, user.getString(Keys.USERID));
-            preparedStmt.setString(2, user.getString(Keys.STOREID));
-            preparedStmt.executeUpdate();
-            establishConnection().close();
+        ResponseEntity favoriteResponse = isFavoriteExist(user);
+        if(favoriteResponse.getStatusCode() == HttpStatus.NOT_FOUND) {
+            Map<String, String> message = new HashMap<>();
+            try {
+                String query;
+                PreparedStatement preparedStmt;
+                query = "INSERT INTO favorites(userId, storeId) VALUES(?, ?) ";
+                preparedStmt = establishConnection().prepareStatement(query);
+                preparedStmt.setString(1, user.getString(Keys.USERID));
+                preparedStmt.setString(2, user.getString(Keys.STOREID));
+                preparedStmt.executeUpdate();
+                establishConnection().close();
+            } catch (SQLException e) {
+                message.put(Keys.MESSAGE, Messages.IDSVALUES);
+                return new ResponseEntity<>(message, HttpStatus.INTERNAL_SERVER_ERROR);
+            } catch (JSONException e) {
+                message.put(Keys.MESSAGE, Messages.JSONKEYSNOTVALID);
+                return new ResponseEntity<>(message, HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+            message.put(Keys.MESSAGE, Messages.FAVORITECREATED);
+            return new ResponseEntity<>(message, HttpStatus.OK);
         }
-        catch (SQLException e){
-            message.put(Keys.MESSAGE, Messages.IDSVALUES);
-            return new ResponseEntity<>(message, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-        catch (JSONException e){
-            message.put(Keys.MESSAGE, Messages.JSONKEYSNOTVALID);
-            return new ResponseEntity<>(message, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-        message.put(Keys.MESSAGE, Messages.FAVORITECREATED);
-        return new ResponseEntity<>(message, HttpStatus.OK);
+        else
+            return favoriteResponse;
     }
 
     @Override
