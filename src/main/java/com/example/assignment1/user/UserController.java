@@ -137,4 +137,20 @@ public class UserController implements IUser {
         }
         return validationResponse;
     }
+
+    @RequestMapping("isFavoriteExist")
+    @PostMapping
+    @Override
+    public ResponseEntity<Map<String, String>> isFavoriteExist(@RequestBody String favorite) throws JSONException, SQLException {
+        StoresDatabase storesDatabase = new StoresData();
+        JSONObject favoriteJson = new JSONObject(favorite);
+        ResponseEntity<Map<String, String>> validationResponse = jwtTokenUtil.validateToken(favoriteJson);
+        if(validationResponse.getStatusCode() == HttpStatus.OK){
+            favoriteJson.put(Keys.USERID, jwtTokenUtil.getIdFromToken(favoriteJson).getString(Keys.ID));
+            return storesDatabase.isFavoriteExist(favoriteJson);
+        }
+        return validationResponse;
+    }
+
+
 }

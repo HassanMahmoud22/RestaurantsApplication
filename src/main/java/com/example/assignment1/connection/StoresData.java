@@ -77,7 +77,7 @@ public class StoresData implements StoresDatabase {
             establishConnection().close();
         }
         catch (SQLException e){
-            message.put(Keys.MESSAGE, Messages.IDsVALUES);
+            message.put(Keys.MESSAGE, Messages.IDSVALUES);
             return new ResponseEntity<>(message, HttpStatus.INTERNAL_SERVER_ERROR);
         }
         catch (JSONException e){
@@ -106,6 +106,31 @@ public class StoresData implements StoresDatabase {
         catch (JSONException e){
             data.put(Keys.MESSAGE, Messages.JSONKEYSNOTVALID);
             return new ResponseEntity<>(data, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @Override
+    public ResponseEntity<Map<String, String>> isFavoriteExist(JSONObject favorite) {
+        Map<String, String> message = new HashMap<>();
+        try {
+            Statement statement = establishConnection().createStatement();
+            ResultSet rs = statement.executeQuery( "SELECT * FROM favorites WHERE userId = '" + favorite.getString(Keys.USERID) + "' and storeId = '" + favorite.getString(Keys.STOREID) + "'");
+           if(rs.next()){
+               message.put(Keys.MESSAGE, Messages.FAVORITEFOUND);
+               return new ResponseEntity<>(message, HttpStatus.OK);
+           }
+           else {
+               message.put(Keys.MESSAGE, Messages.FAVORITENOTFOUD);
+               return new ResponseEntity<>(message, HttpStatus.NOT_FOUND);
+           }
+        }
+        catch (SQLException e){
+            message.put(Keys.MESSAGE, Messages.IDSVALUES);
+            return new ResponseEntity<>(message, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        catch (JSONException e){
+            message.put(Keys.MESSAGE, Messages.JSONKEYSNOTVALID);
+            return new ResponseEntity<>(message, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }

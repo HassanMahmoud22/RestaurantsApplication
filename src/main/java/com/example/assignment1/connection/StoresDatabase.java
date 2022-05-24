@@ -25,4 +25,6 @@ public interface StoresDatabase {
     ResponseEntity<Map<String, String>> addToFavorite(JSONObject user) throws SQLException;
 
     ResponseEntity<Map<String, String>> getStore(JSONObject store) throws SQLException;
+
+    ResponseEntity<Map<String, String>> isFavoriteExist(JSONObject user) throws SQLException;
 }

@@ -27,4 +27,8 @@ public interface IUser {
     @RequestMapping("addToFavorite")
     @PostMapping
     ResponseEntity<Map<String, String>> addToFavorite(@RequestBody String user) throws JSONException, SQLException;
+
+    @RequestMapping("isFavoriteExist")
+    @PostMapping
+    ResponseEntity<Map<String, String>> isFavoriteExist(@RequestBody String favorite) throws JSONException, SQLException;
 }

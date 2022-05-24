@@ -17,7 +17,8 @@ public class Messages {
     public static final String VALIDUSER = "valid user";
     public static final String LOGINSUCCESS = "logged in successfully";
     public static final String LOGINFAILED = "The Credentials are wrong";
-    public static final String IDsVALUES = "There's problem with Ids Values";
+    public static final String IDSVALUES = "There's problem with Ids Values";
     public static final String FAVORITECREATED = "The Store is added to Your Favorites Successfully";
-
+    public static final String FAVORITEFOUND= "The Favorite Exists";
+    public static final String FAVORITENOTFOUD= "The Favorite Doesn't Exist";
 }
