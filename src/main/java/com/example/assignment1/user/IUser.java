@@ -17,6 +17,7 @@ public interface IUser {
     ResponseEntity<Map<String, String>> updateProfile(@RequestBody String credentials) throws JSONException, SQLException, ClassNotFoundException;
     ResponseEntity<Map<String, String>> getUser(@RequestBody String id) throws JSONException, SQLException, ClassNotFoundException;
     ResponseEntity<List<Map<String,String>>> getStores(@RequestBody String user) throws JSONException, SQLException;
+    ResponseEntity<List<Map<String,String>>> getProducts(@RequestBody String user) throws JSONException, SQLException;
 
     @RequestMapping("getStore")
     @PostMapping
@@ -31,4 +32,8 @@ public interface IUser {
     @RequestMapping("isFavoriteExist")
     @PostMapping
     ResponseEntity<Map<String, String>> isFavoriteExist(@RequestBody String favorite) throws JSONException, SQLException;
+
+    @RequestMapping("getAll")
+    @PostMapping
+    ResponseEntity<List<Map<String,String>>> getAll(@RequestBody String store) throws JSONException, SQLException;
 }

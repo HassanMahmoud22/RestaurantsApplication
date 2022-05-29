@@ -1,9 +1,6 @@
 package com.example.assignment1.user;
 
-import com.example.assignment1.connection.Database;
-import com.example.assignment1.connection.StoresData;
-import com.example.assignment1.connection.StoresDatabase;
-import com.example.assignment1.connection.UserData;
+import com.example.assignment1.connection.*;
 import com.example.assignment1.constants.Keys;
 import com.example.assignment1.constants.Messages;
 import com.example.assignment1.security.JwtTokenUtil;
@@ -150,6 +147,19 @@ public class UserController implements IUser {
             return storesDatabase.isFavoriteExist(favoriteJson);
         }
         return validationResponse;
+    }
+
+    @RequestMapping("getProducts")
+    @PostMapping
+    @Override
+    public ResponseEntity<List<Map<String,String>>> getProducts(@RequestBody String store) throws JSONException, SQLException {
+        ProductsDatabase productsDatabase = new ProductsData();
+        List<Map<String, String>> dummy = new ArrayList<>();
+        JSONObject productsJson = new JSONObject(store);
+        if(jwtTokenUtil.validateToken(productsJson).getStatusCode() == HttpStatus.OK){
+            return productsDatabase.getProducts(productsJson);
+        }
+        return new ResponseEntity<>(dummy, jwtTokenUtil.validateToken(productsJson).getStatusCode());
     }
 
 
