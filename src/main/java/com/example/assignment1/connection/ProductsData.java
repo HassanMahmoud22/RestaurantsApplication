@@ -25,6 +25,7 @@ public class ProductsData implements ProductsDatabase{
             while(rs.next())
             {
                 Map<String,String> data = new HashMap<>();
+                data.put("id", rs.getString("id"));
                 data.put("productName", rs.getString("productName"));
                 data.put("productDescription", rs.getString("productDescription"));
                 data.put("photo", rs.getString("photo"));
