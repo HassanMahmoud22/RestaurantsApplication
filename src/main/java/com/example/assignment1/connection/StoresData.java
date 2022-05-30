@@ -136,4 +136,16 @@ public class StoresData implements StoresDatabase {
             return new ResponseEntity<>(message, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+    @Override
+    public ResponseEntity<List<Map<String, String>>> getSearchedStores(JSONObject productId) throws SQLException{
+        List<Map<String, String>> finalData = new ArrayList<>();
+        Statement statement = establishConnection().createStatement();
+        ResultSet rs = statement.executeQuery("SELECT s.id, s.storeName, s.description, s.photo, s.latitude, s.longitude\n" +
+                "FROM stores s\n" +
+                "INNER JOIN services\n" +
+                "INNER JOIN products\n" +
+                "ON services.productId = products.id and services.storeId = s.id\n" +
+                "Where products.id = '" + productId.getString("productId") + "'");
+        return getListResponseEntity(finalData, rs);
+    }
 }

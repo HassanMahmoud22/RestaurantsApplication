@@ -16,5 +16,6 @@ public interface ProductsDatabase {
         return connection;
     }
     ResponseEntity<List<Map<String, String>>> getProducts(JSONObject store) throws SQLException;
+    ResponseEntity<List<Map<String, String>>> getAllProducts();
 
 }

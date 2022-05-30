@@ -162,5 +162,29 @@ public class UserController implements IUser {
         return new ResponseEntity<>(dummy, jwtTokenUtil.validateToken(productsJson).getStatusCode());
     }
 
+    @RequestMapping("getAllProducts")
+    @PostMapping
+    @Override
+    public ResponseEntity<List<Map<String,String>>> getAllProducts(@RequestBody String token) throws JSONException, SQLException {
+        ProductsDatabase productsDatabase = new ProductsData();
+        List<Map<String, String>> dummy = new ArrayList<>();
+        JSONObject tokensJson = new JSONObject(token);
+        if(jwtTokenUtil.validateToken(tokensJson).getStatusCode() == HttpStatus.OK){
+            return productsDatabase.getAllProducts();
+        }
+        return new ResponseEntity<>(dummy, jwtTokenUtil.validateToken(tokensJson).getStatusCode());
+    }
 
+    @RequestMapping("getSearchedStores")
+    @PostMapping
+    @Override
+    public ResponseEntity<List<Map<String,String>>> getSearchedStores(@RequestBody String productId) throws JSONException, SQLException {
+        StoresDatabase storesDatabase = new StoresData();
+        List<Map<String, String>> dummy = new ArrayList<>();
+        JSONObject productIdJson = new JSONObject(productId);
+        if(jwtTokenUtil.validateToken(productIdJson).getStatusCode() == HttpStatus.OK){
+            return storesDatabase.getSearchedStores(productIdJson);
+        }
+        return new ResponseEntity<>(dummy, jwtTokenUtil.validateToken(productIdJson).getStatusCode());
+    }
 }

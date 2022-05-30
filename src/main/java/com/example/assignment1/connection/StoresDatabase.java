@@ -27,4 +27,5 @@ public interface StoresDatabase {
     ResponseEntity<Map<String, String>> getStore(JSONObject store) throws SQLException;
 
     ResponseEntity<Map<String, String>> isFavoriteExist(JSONObject user) throws SQLException;
+    ResponseEntity<List<Map<String, String>>> getSearchedStores(JSONObject productId) throws SQLException;
 }

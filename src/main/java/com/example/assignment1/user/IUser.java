@@ -33,4 +33,11 @@ public interface IUser {
     @PostMapping
     ResponseEntity<Map<String, String>> isFavoriteExist(@RequestBody String favorite) throws JSONException, SQLException;
 
+    @RequestMapping("getAllProducts")
+    @PostMapping
+    ResponseEntity<List<Map<String,String>>> getAllProducts(@RequestBody String token) throws JSONException, SQLException;
+
+    @RequestMapping("getSearchedStores")
+    @PostMapping
+    ResponseEntity<List<Map<String,String>>> getSearchedStores(@RequestBody String productId) throws JSONException, SQLException;
 }
