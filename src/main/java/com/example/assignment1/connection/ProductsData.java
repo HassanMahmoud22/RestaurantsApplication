@@ -45,15 +45,14 @@ public class ProductsData implements ProductsDatabase{
         List<Map<String, String>> allProducts= new ArrayList<>();
         try{
             Statement statement = establishConnection().createStatement();
-            ResultSet rs = statement.executeQuery("SELECT p.productName, p.productDescription, p.photo, s.price\n" +
-                    "FROM products p , services s \n" +
-                    "INNER JOIN services\n" +
-                    "INNER JOIN stores\n" +
-                    "ON services.storeId = stores.id \n" +
-                    "Where s.storeId = '" + store.getString(Keys.STOREID) + "'");
+            ResultSet rs = statement.executeQuery("select products.id,  products.productName,   products.productDescription,  products.photo, services.price\n" +
+                    "from products \n" +
+                    "inner join  stores,services\n" +
+                    "where services.productId=products.id and services.storeId=stores.id  and stores.id='"+ store.getString(Keys.STOREID)+"'");
             while(rs.next())
             {
                 Map<String,String> data = new HashMap<>();
+                data.put("id", rs.getString("id"));
                 data.put("productName", rs.getString("productName"));
                 data.put("productDescription", rs.getString("productDescription"));
                 data.put("photo", rs.getString("photo"));
