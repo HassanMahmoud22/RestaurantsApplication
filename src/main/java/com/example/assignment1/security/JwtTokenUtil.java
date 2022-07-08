@@ -65,11 +65,7 @@ public class JwtTokenUtil implements Serializable {
         Map<String, Object> claims = new HashMap<>();
         return doGenerateToken(claims, user);
     }
-    //while creating the token -
-    //1. Define  claims of the token, like Issuer, Expiration, Subject, and the ID
-    //2. Sign the JWT using the HS512 algorithm and secret key.
-    //3. According to JWS Compact Serialization(https://tools.ietf.org/html/draft-ietf-jose-json-web-signature-41#section-3.1)
-    //   compaction of the JWT to a URL-safe string
+
     private String doGenerateToken( Map<String, Object> claims, JSONObject user) {
         return Jwts.builder().setClaims(claims).setSubject(getUserData(user)).setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY * 1000))
@@ -97,26 +93,3 @@ public class JwtTokenUtil implements Serializable {
         }
     }
 }
-
- /*//validate token
-     public ResponseEntity<Map<String, String>> validateToken(JSONObject user) {
-        Map<String, String> message = new HashMap<>();
-        try{
-            String userFromToken = sortUserData(getUserFromToken(user.getString(TOKEN)));
-            String passedUser = sortUserData(convertToMapFormat(user));
-            if(userFromToken.equals(passedUser) && !isTokenExpired(user.getString(TOKEN))){
-                message.put(MESSAGE, AUTHORIZED);
-                return new ResponseEntity<>(message, HttpStatus.OK);
-            }
-            message.put(MESSAGE, UNAUTHORIZED);
-            return new ResponseEntity<>(message, HttpStatus.UNAUTHORIZED);
-        }
-        catch (SignatureException e){
-            message.put(MESSAGE, UNAUTHORIZED);
-            return new ResponseEntity<>(message, HttpStatus.UNAUTHORIZED);
-        }
-        catch (JSONException e){
-            message.put(MESSAGE, "Json keys are not correct");
-            return new ResponseEntity<>(message, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }*/
